@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">◧</span>
+      <span class="brand-name">Study<br>Tracker</span>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Subjects</h3>
+      <ul id="subject-list" class="subject-list"></ul>
+      <button id="add-subject-btn" class="btn-ghost">+ Add subject</button>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Pomodoro timer</h3>
+      <div id="pomodoro-box" class="pomodoro-box">
+        <span id="pomodoro-mode" class="pomodoro-mode">Focus</span>
+        <span id="pomodoro-time" class="pomodoro-time" aria-live="off">25:00</span>
+        <label class="pomodoro-subject-label">Subject
+          <select id="pomodoro-subject"></select>
+        </label>
+        <div class="pomodoro-controls">
+          <button id="pomodoro-start" class="btn-primary btn-small">Start</button>
+          <button id="pomodoro-reset" class="btn-ghost btn-small">Reset</button>
+        </div>
+        <button id="pomodoro-skip" class="btn-ghost btn-small hidden">Skip break</button>
+        <p class="pomodoro-hint">A finished focus round is logged for you.</p>
+      </div>
+    </div>
+
+    <div class="sidebar-section streak-box">
+      <span class="streak-label">Current streak</span>
+      <span id="streak-count" class="streak-count">0</span>
+      <span id="streak-unit" class="streak-unit">days</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <p id="today-date" class="eyebrow">Dashboard</p>
+        <h1>Today's session log</h1>
+      </div>
+      <button id="log-session-btn" class="btn-primary" title="Shortcut: N">+ Log a session</button>
+    </header>
+
+    <section class="stat-row" aria-label="Study totals">
+      <div class="stat-card stat-card-goal">
+        <span class="stat-label">Today</span>
+        <span id="stat-today" class="stat-value">0h 0m</span>
+        <div class="goal-bar" role="progressbar" aria-label="Daily goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="goal-fill" class="goal-fill"></div>
+        </div>
+        <label class="goal-line">
+          <span id="goal-text">0% of</span>
+          <input id="goal-input" type="number" min="15" max="1440" step="15" value="120" aria-label="Daily goal in minutes">
+          <span>min goal</span>
+        </label>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Last 7 days</span>
+        <span id="stat-week" class="stat-value">0h 0m</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">All time</span>
+        <span id="stat-total" class="stat-value">0h 0m</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Sessions logged</span>
+        <span id="stat-sessions" class="stat-value">0</span>
+      </div>
+    </section>
+
+    <section class="panel-row">
+      <div class="panel chart-panel">
+        <div class="panel-head">
+          <h2>Hours per subject <span id="chart-sub" class="panel-sub">last 7 days</span></h2>
+          <div class="seg" role="group" aria-label="Chart range">
+            <button class="seg-btn active" data-days="7">7 days</button>
+            <button class="seg-btn" data-days="30">30 days</button>
+          </div>
+        </div>
+        <canvas id="subject-chart" height="220"></canvas>
+      </div>
+
+      <div class="panel heatmap-panel">
+        <div class="panel-head">
+          <h2>Consistency grid <span class="panel-sub">last 12 weeks</span></h2>
+        </div>
+        <div class="heatmap-wrap">
+          <div class="heatmap-days" aria-hidden="true">
+            <span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span></span>
+          </div>
+          <div id="heatmap" class="heatmap"></div>
+        </div>
+        <div class="heatmap-legend" aria-hidden="true">
+          <span>Less</span>
+          <i style="background:#2e333e"></i><i style="background:#2f7a72"></i><i style="background:#3d9d8f"></i><i style="background:#4fd1c5"></i><i style="background:#8de8de"></i>
+          <span>More</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Recent sessions</h2>
+        <button id="export-btn" class="btn-ghost btn-inline">Export CSV</button>
+      </div>
+      <div id="filter-chip" class="filter-chip hidden">
+        <span id="filter-text"></span>
+        <button id="clear-filter" class="icon-btn" title="Show all subjects" aria-label="Clear subject filter">✕</button>
+      </div>
+      <div class="table-wrap">
+        <table class="session-table">
+          <thead>
+            <tr><th>Subject</th><th>Duration</th><th>Date</th><th></th></tr>
+          </thead>
+          <tbody id="session-tbody"></tbody>
+        </table>
+      </div>
+      <p id="empty-state" class="empty-state"></p>
+      <button id="show-more-btn" class="btn-ghost btn-inline hidden">Show all sessions</button>
+    </section>
+
+  </main>
+</div>
+
+<!-- Log Session Modal -->
+<div id="session-modal" class="modal-overlay hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
+    <h2 id="session-modal-title">Log a study session</h2>
+    <form id="session-form">
+      <label>Subject
+        <select id="session-subject" required></select>
+      </label>
+      <label>Duration (minutes)
+        <input id="session-duration" type="number" min="1" max="1440" required placeholder="e.g. 45">
+      </label>
+      <div class="chips" aria-label="Quick durations">
+        <button type="button" class="chip" data-min="25">25m</button>
+        <button type="button" class="chip" data-min="45">45m</button>
+        <button type="button" class="chip" data-min="60">1h</button>
+        <button type="button" class="chip" data-min="90">1h 30m</button>
+        <button type="button" class="chip" data-min="120">2h</button>
+      </div>
+      <label>Date
+        <input id="session-date" type="date" required>
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="cancel-session" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Save session</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add/Edit Subject Modal -->
+<div id="subject-modal" class="modal-overlay hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="subject-modal-title">
+    <h2 id="subject-modal-title">Add a subject</h2>
+    <form id="subject-form">
+      <input type="hidden" id="subject-edit-id" value="">
+      <label>Subject name
+        <input id="subject-name" type="text" required maxlength="40" placeholder="e.g. IoT Application Dev">
+      </label>
+      <label>Color tag
+        <input id="subject-color" type="color" value="#4fd1c5">
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="delete-subject-btn" class="btn-danger hidden">Delete subject</button>
+        <button type="button" id="cancel-subject" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary">Save subject</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
