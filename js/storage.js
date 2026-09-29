@@ -84,8 +84,77 @@ function updateSubject(data, id, updates) {
   if (subj) {
     subj.name = updates.name;
     subj.color = updates.color;
+    subj.weeklyGoal = updates.weeklyGoal || 0;
     saveData(data);
   }
+}
+
+function updateSession(data, id, updates) {
+  const session = data.sessions.find(s => s.id === id);
+  if (session) {
+    session.subjectId = updates.subjectId;
+    session.duration = updates.duration;
+    session.date = updates.date;
+    saveData(data);
+  }
+}
+
+// ---- Backup and restore ----
+
+function buildBackup(data) {
+  return JSON.stringify({
+    app: "study-tracker",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    subjects: data.subjects,
+    sessions: data.sessions,
+    settings: data.settings
+  }, null, 2);
+}
+
+// Validates a backup file and keeps only well-formed entries.
+// Returns { ok: true, data } or { ok: false, error }.
+function parseBackup(text) {
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return { ok: false, error: "This file is not valid JSON." };
+  }
+  if (!raw || !Array.isArray(raw.subjects) || !Array.isArray(raw.sessions)) {
+    return { ok: false, error: "This does not look like a Study Tracker backup." };
+  }
+
+  const subjects = raw.subjects
+    .filter(s => s && typeof s.id === "string" && typeof s.name === "string" && s.name.trim())
+    .map(s => ({
+      id: s.id,
+      name: s.name.trim().slice(0, 40),
+      color: /^#[0-9a-f]{6}$/i.test(s.color) ? s.color : "#4fd1c5",
+      weeklyGoal: Number(s.weeklyGoal) > 0 && Number(s.weeklyGoal) <= 168 ? Number(s.weeklyGoal) : 0
+    }));
+
+  const ids = new Set(subjects.map(s => s.id));
+  const sessions = raw.sessions
+    .filter(s => s && typeof s.id === "string" && ids.has(s.subjectId)
+      && Number.isInteger(s.duration) && s.duration >= 1 && s.duration <= 1440
+      && typeof s.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.date))
+    .map(s => ({
+      id: s.id,
+      subjectId: s.subjectId,
+      duration: s.duration,
+      date: s.date,
+      createdAt: Number(s.createdAt) || 0
+    }));
+
+  const goal = raw.settings && Number(raw.settings.dailyGoal);
+  const settings = {
+    ...DEFAULT_SETTINGS,
+    dailyGoal: goal >= 15 && goal <= 1440 ? goal : DEFAULT_SETTINGS.dailyGoal,
+    lastSubject: raw.settings && ids.has(raw.settings.lastSubject) ? raw.settings.lastSubject : ""
+  };
+
+  return { ok: true, data: { subjects, sessions, settings } };
 }
 
 function deleteSubject(data, id) {

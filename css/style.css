@@ -76,10 +76,22 @@ button { cursor: pointer; }
   margin-bottom: 12px;
 }
 
-.subject-list li {
+.subject-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+}
+
+.subject-goal { display: flex; flex-direction: column; gap: 3px; padding-left: 20px; }
+.subject-goal .goal-bar { margin-top: 0; height: 4px; }
+.subject-goal-text { font-size: 11px; color: var(--text-dim); }
+
+.subject-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   font-size: 14px;
   padding: 8px 10px;
   border-radius: 6px;
@@ -384,6 +396,20 @@ button { cursor: pointer; }
   border-radius: 4px;
 }
 .delete-btn:hover { color: var(--danger); }
+
+.backup-buttons { display: flex; gap: 8px; }
+.streak-box + .backup-section { margin-top: -8px; }
+
+.row-actions { display: flex; gap: 2px; justify-content: flex-end; }
+.edit-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.edit-btn:hover { color: var(--accent); }
 
 .filter-chip {
   display: inline-flex;

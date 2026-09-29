@@ -48,6 +48,15 @@
       <span id="streak-count" class="streak-count">0</span>
       <span id="streak-unit" class="streak-unit">days</span>
     </div>
+
+    <div class="sidebar-section backup-section">
+      <h3>Backup</h3>
+      <div class="backup-buttons">
+        <button id="backup-export-btn" class="btn-ghost btn-small">Save backup</button>
+        <button id="backup-import-btn" class="btn-ghost btn-small">Restore</button>
+      </div>
+      <input id="backup-file" type="file" accept="application/json,.json" class="hidden">
+    </div>
   </aside>
 
   <!-- Main -->
@@ -147,6 +156,7 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
     <h2 id="session-modal-title">Log a study session</h2>
     <form id="session-form">
+      <input type="hidden" id="session-edit-id" value="">
       <label>Subject
         <select id="session-subject" required></select>
       </label>
@@ -165,7 +175,7 @@
       </label>
       <div class="modal-actions">
         <button type="button" id="cancel-session" class="btn-ghost">Cancel</button>
-        <button type="submit" class="btn-primary">Save session</button>
+        <button type="submit" id="session-submit" class="btn-primary">Save session</button>
       </div>
     </form>
   </div>
@@ -182,6 +192,9 @@
       </label>
       <label>Color tag
         <input id="subject-color" type="color" value="#4fd1c5">
+      </label>
+      <label>Weekly goal (hours, optional)
+        <input id="subject-goal" type="number" min="0" max="168" step="0.5" placeholder="e.g. 5">
       </label>
       <div class="modal-actions">
         <button type="button" id="delete-subject-btn" class="btn-danger hidden">Delete subject</button>

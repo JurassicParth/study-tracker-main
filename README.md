@@ -13,6 +13,9 @@ A single-page dashboard to log and visualize study sessions. Built with HTML, CS
 - 12-week consistency grid with day labels and a legend.
 - Streak counter.
 - Pomodoro timer that logs finished focus rounds, shows the time in the tab title, plays a sound and starts a break.
+- Edit any logged session (subject, duration or date).
+- Weekly goal per subject (Monday to Sunday), with a progress bar in the sidebar.
+- Save a JSON backup and restore it later, for example on another browser or device.
 - Undo after deleting a session.
 - Export sessions as CSV.
 - Shortcuts: `N` opens the log form, `Esc` closes any dialog.
